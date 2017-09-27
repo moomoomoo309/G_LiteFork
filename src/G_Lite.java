@@ -44,7 +44,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-@SuppressWarnings("HardcodedFileSeparator")
+@SuppressWarnings({"HardcodedFileSeparator", "unused"})
 class G_Lite extends JFrame implements Printable {
     private JButton AssemLangChooser;
     private JButton Assemble;
@@ -210,6 +210,8 @@ class G_Lite extends JFrame implements Printable {
     }
 
     private void Compile_buttonActionPerformed(ActionEvent evt) {
+        if (this.CFile.getText().isEmpty())
+            return;
         String cfile = '"' + this.workPath + this.CFile.getText() + '"';
         String outfile = '"' + this.workPath + "cout" + '"';
         String cs252 = this.workPath + this.runfile;
@@ -238,6 +240,7 @@ class G_Lite extends JFrame implements Printable {
             int result = p.waitFor();
             this.processText.append("Compile Result: " + result + System.getProperty("line.separator"));
             p.destroy();
+            @SuppressWarnings("unused")
             boolean var14 = tmpFile.delete();
         } catch (IOException | InterruptedException var15) {
             System.out.println(var15.getMessage());
@@ -258,6 +261,8 @@ class G_Lite extends JFrame implements Printable {
     }
 
     private void AssembleActionPerformed(ActionEvent evt) {
+        if (this.SFile.getText().isEmpty())
+            return;
         String sfile = '"' + this.workPath + this.SFile.getText() + '"';
         String outfile = '"' + this.workPath + "sout" + '"';
         String cs252 = this.workPath + this.runfile;
@@ -286,6 +291,7 @@ class G_Lite extends JFrame implements Printable {
             int result = p.waitFor();
             this.processText.append("Assembly Result: " + result + System.getProperty("line.separator"));
             p.destroy();
+            @SuppressWarnings("unused")
             boolean var14 = tmpFile.delete();
         } catch (IOException | InterruptedException var15) {
             System.out.println(var15.getMessage());
@@ -360,7 +366,8 @@ class G_Lite extends JFrame implements Printable {
         try {
             String Rcommand = runCommand + outfile;
             PrintWriter ostream = new PrintWriter(new FileWriter(cs252));
-            ostream.println("@echo off");
+            if (isWindows)
+                ostream.println("@echo off");
             ostream.println(Rcommand);
             ostream.close();
             if (!isWindows)
@@ -379,6 +386,7 @@ class G_Lite extends JFrame implements Printable {
 
             int result = p.waitFor();
             p.destroy();
+            @SuppressWarnings("unused")
             boolean var14 = tmpFile.delete();
         } catch (IOException | InterruptedException var15) {
             System.out.println(var15.getMessage());
