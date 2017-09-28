@@ -1,3 +1,5 @@
+import jdk.nashorn.internal.scripts.JO;
+
 import javax.print.PrintService;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -51,16 +54,16 @@ class G_Lite extends JFrame implements Printable {
 
     /**
      * Parses command line arguments and sets the look and feel of Swing.
-     * @param args Command line arguments. <br>
-     *             The program looks for:
-     *             <ol>
-     *                 <li>
-     *                     --runexecutable=(executablename)
-     *                 </li>
-     *                 <li>
-     *                     --compileexecutable=(compileexecutable)\
-     *                 </li>
-     *             </ol>
+     * @param args Command line arguments.<br>
+     * The program looks for:
+     * <ol>
+     *     <li>
+     *         --runexecutable=(executablename)
+     *     </li>
+     *     <li>
+     *         --compileexecutable=(compileexecutable)\
+     *     </li>
+     * </ol>
      */
     public static void main(String[] args) {
         for (String arg : args)
@@ -102,6 +105,7 @@ class G_Lite extends JFrame implements Printable {
         JButton exitButton = new JButton();
         JButton printButton = new JButton();
         JButton filePrint = new JButton();
+        JButton cleanButton = new JButton();
 
         JPanel innerPanel = new JPanel();
         JScrollPane processOutput = new JScrollPane();
@@ -116,51 +120,56 @@ class G_Lite extends JFrame implements Printable {
         compileButton.setText("Compile");
         compileButton.setToolTipText("Press this button to compile the C program. A file cout is created in the working directory.");
         compileButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        compileButton.addActionListener(evt -> G_Lite.this.onCompilePressed());
+        compileButton.addActionListener(evt -> onCompilePressed());
 
         assembleButton.setText("Assemble");
         assembleButton.setToolTipText("Press this button to assemble the ARM file. This will create an sout file in the working directory.");
         assembleButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        assembleButton.addActionListener(evt1 -> G_Lite.this.onAssemblePressed());
+        assembleButton.addActionListener(evt1 -> onAssemblePressed());
 
         linkButton.setText("Link");
         linkButton.setToolTipText("Press this button to create a runnable file. If a name is entered in the text box tat will be the name of the file, otherwise it is called runit.");
         linkButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        linkButton.addActionListener(evt1 -> G_Lite.this.onLinkPressed());
+        linkButton.addActionListener(evt1 -> onLinkPressed());
 
         runButton.setText("Run");
         runButton.setToolTipText("Press this button to run the file.");
         runButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        runButton.addActionListener(evt1 -> G_Lite.this.onRunPressed());
+        runButton.addActionListener(evt1 -> onRunPressed());
 
         cLangChooser.setBackground(new Color(255, 255, 255));
         cLangChooser.setText("C  language file");
         cLangChooser.setToolTipText("Press this button ot chose the C lanuguage file to compile");
         cLangChooser.setActionCommand("C_language_file");
         cLangChooser.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        cLangChooser.addActionListener(evt2 -> G_Lite.this.onCLangChooserPressed());
+        cLangChooser.addActionListener(evt2 -> onCLangChooserPressed());
 
         assemblyLangChooser.setBackground(new Color(255, 255, 255));
         assemblyLangChooser.setText("Assembly Language file");
         assemblyLangChooser.setToolTipText("Press this butto to chose the ARM assembly language file to assemble.");
         assemblyLangChooser.setActionCommand("Assembly_lang_file");
         assemblyLangChooser.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        assemblyLangChooser.addActionListener(evt2 -> G_Lite.this.onAssemblyLangChooserPressed());
+        assemblyLangChooser.addActionListener(evt2 -> onAssemblyLangChooserPressed());
 
         exitButton.setText("Exit");
         exitButton.setToolTipText("This will exit the application.");
         exitButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        exitButton.addActionListener(evt -> G_Lite.this.onExitPressed());
+        exitButton.addActionListener(evt -> onExitPressed());
+        
+        cleanButton.setText("Clean");
+        cleanButton.setToolTipText("This will remove any leftover files, such as cout, sout, and runit.");
+        cleanButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+        cleanButton.addActionListener(evt -> onCleanPressed());
 
         printButton.setText("Print");
         printButton.setToolTipText("This button will print the contents of the text area to the left." + System.getProperty("line.separator"));
         printButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        printButton.addActionListener(actionListener -> this.onPrintPressed());
+        printButton.addActionListener(actionListener -> onPrintPressed());
 
         filePrint.setText("File");
         filePrint.setToolTipText("This button will create a text file of the source files and execution");
         filePrint.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        filePrint.addActionListener(evt1 -> G_Lite.this.onFilePressed());
+        filePrint.addActionListener(evt1 -> onFilePressed());
 
         GroupLayout innerLayout = new GroupLayout(innerPanel);
         innerLayout.setHorizontalGroup(innerLayout.createParallelGroup(Alignment.LEADING).addGroup(innerLayout.createSequentialGroup().addGroup(innerLayout.createParallelGroup(Alignment.LEADING).addGroup(Alignment.TRAILING, innerLayout.createSequentialGroup().addComponent(printButton).addGap(18, 18, 18).addComponent(filePrint, -1, -1, 32767)).addGroup(Alignment.TRAILING, innerLayout.createSequentialGroup().addGap(0, 0, 32767).addComponent(exitButton))).addContainerGap()));
@@ -177,16 +186,109 @@ class G_Lite extends JFrame implements Printable {
         studentNameLabel.setText("Student Name");
 
         GroupLayout mainPanelLayout = new GroupLayout(mainPanel);
-        mainPanelLayout.setHorizontalGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addGroup(mainPanelLayout.createSequentialGroup().addComponent(processOutput, -1, 420, 32767).addGap(37, 37, 37).addComponent(innerPanel, -2, -1, -2).addGap(22, 22, 22)).addGroup(mainPanelLayout.createSequentialGroup().addGap(30, 30, 30).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addComponent(runButton).addGroup(mainPanelLayout.createSequentialGroup().addGroup(mainPanelLayout.createParallelGroup(Alignment.TRAILING, false).addGroup(Alignment.LEADING, mainPanelLayout.createSequentialGroup().addComponent(linkButton).addPreferredGap(ComponentPlacement.RELATED).addComponent(this.runFileField, -1, 172, 32767)).addGroup(Alignment.LEADING, mainPanelLayout.createSequentialGroup().addComponent(assembleButton).addPreferredGap(ComponentPlacement.RELATED).addComponent(this.asmFileField)).addGroup(Alignment.LEADING, mainPanelLayout.createSequentialGroup().addComponent(compileButton).addPreferredGap(ComponentPlacement.RELATED).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING, false).addComponent(this.studentName, -1, 172, 32767).addComponent(this.cFileField)))).addGap(18, 18, 18).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addComponent(studentNameLabel).addComponent(cLangChooser).addComponent(assemblyLangChooser)))).addContainerGap(163, 32767)));
+        mainPanelLayout.setHorizontalGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING)
+                                                          .addGroup(mainPanelLayout
+                                                                            .createSequentialGroup()
+                                                                            .addComponent(processOutput, -1, 420, 32767)
+                                                                            .addGap(37, 37, 37)
+                                                                            .addComponent(innerPanel, -2, -1, -2)
+                                                                            .addGap(22, 22, 22))
+                                                          .addGroup(mainPanelLayout.createSequentialGroup()
+                                                                                   .addGap(30, 30, 30)
+                                                                                   .addGroup(mainPanelLayout
+                                                                                                     .createParallelGroup(Alignment.LEADING)
+                                                                                                     .addComponent(runButton)
+                                                                                                     .addGroup(mainPanelLayout
+                                                                                                                       .createSequentialGroup()
+                                                                                                                       .addGroup(mainPanelLayout
+                                                                                                                                         .createParallelGroup(Alignment.TRAILING, false)
+                                                                                                                                         .addGroup(Alignment.LEADING, mainPanelLayout
+                                                                                                                                                 .createSequentialGroup()
+                                                                                                                                                 .addComponent(linkButton)
+                                                                                                                                                 .addPreferredGap(ComponentPlacement.RELATED)
+                                                                                                                                                 .addComponent(this.runFileField, -1, 172, 32767))
+                                                                                                                                         .addGroup(Alignment.LEADING, mainPanelLayout
+                                                                                                                                                 .createSequentialGroup()
+                                                                                                                                                 .addComponent(assembleButton)
+                                                                                                                                                 .addPreferredGap(ComponentPlacement.RELATED)
+                                                                                                                                                 .addComponent(this.asmFileField))
+                                                                                                                                         .addGroup(Alignment.LEADING, mainPanelLayout
+                                                                                                                                                 .createSequentialGroup()
+                                                                                                                                                 .addComponent(compileButton)
+                                                                                                                                                 .addPreferredGap(ComponentPlacement.RELATED)
+                                                                                                                                                 .addGroup(mainPanelLayout
+                                                                                                                                                                   .createParallelGroup(Alignment.LEADING, false)
+                                                                                                                                                                   .addComponent(this.studentName, -1, 172, 32767)
+                                                                                                                                                                   .addComponent(this.cFileField))))
+                                                                                                                       .addGap(18, 18, 18)
+                                                                                                                       .addGroup(mainPanelLayout
+                                                                                                                                         .createParallelGroup(Alignment.LEADING)
+                                                                                                                                         .addComponent(studentNameLabel)
+                                                                                                                                         .addComponent(cLangChooser)
+                                                                                                                                         .addComponent(assemblyLangChooser))))
+                                                                                   .addContainerGap(163, 32767)));
+
         mainPanelLayout.linkSize(0, assembleButton, compileButton, linkButton, runButton);
         mainPanelLayout.linkSize(0, assemblyLangChooser, cLangChooser);
-        mainPanelLayout.setVerticalGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addGroup(mainPanelLayout.createSequentialGroup().addContainerGap(50, 32767).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addGroup(Alignment.TRAILING, mainPanelLayout.createSequentialGroup().addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING, false).addComponent(this.studentName, -2, -1, -2).addGroup(mainPanelLayout.createSequentialGroup().addGap(3, 3, 3).addComponent(studentNameLabel, -1, -1, 32767))).addPreferredGap(ComponentPlacement.UNRELATED).addGroup(mainPanelLayout.createParallelGroup(Alignment.BASELINE).addComponent(compileButton).addComponent(this.cFileField, -2, -1, -2).addComponent(cLangChooser)).addPreferredGap(ComponentPlacement.RELATED).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addGroup(mainPanelLayout.createParallelGroup(Alignment.BASELINE).addComponent(assembleButton).addComponent(assemblyLangChooser)).addComponent(this.asmFileField, -2, -1, -2)).addPreferredGap(ComponentPlacement.UNRELATED).addGroup(mainPanelLayout.createParallelGroup(Alignment.BASELINE).addComponent(this.runFileField, -2, -1, -2).addComponent(linkButton)).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(runButton).addGap(26, 26, 26).addComponent(processOutput, -2, 100, -2)).addComponent(innerPanel, Alignment.TRAILING, -2, -1, -2))));
+
+        mainPanelLayout.setVerticalGroup(mainPanelLayout
+                                                 .createParallelGroup(Alignment.LEADING)
+                                                 .addGroup(mainPanelLayout
+                                                                   .createSequentialGroup()
+                                                                   .addContainerGap(50, 32767)
+                                                                   .addGroup(mainPanelLayout
+                                                                                     .createParallelGroup(Alignment.LEADING)
+                                                                                     .addGroup(Alignment.TRAILING, mainPanelLayout
+                                                                                             .createSequentialGroup()
+                                                                                             .addGroup(mainPanelLayout
+                                                                                                               .createParallelGroup(Alignment.LEADING, false)
+                                                                                                               .addComponent(this.studentName, -2, -1, -2)
+                                                                                                               .addGroup(mainPanelLayout.createSequentialGroup()
+                                                                                                                                        .addGap(3, 3, 3)
+                                                                                                                                        .addComponent(studentNameLabel, -1, -1, 32767)))
+                                                                                             .addPreferredGap(ComponentPlacement.UNRELATED)
+                                                                                             .addGroup(mainPanelLayout
+                                                                                                               .createParallelGroup(Alignment.BASELINE)
+                                                                                                               .addComponent(compileButton)
+                                                                                                               .addComponent(this.cFileField, -2, -1, -2)
+                                                                                                               .addComponent(cLangChooser))
+                                                                                             .addPreferredGap(ComponentPlacement.RELATED)
+                                                                                             .addGroup(mainPanelLayout
+                                                                                                               .createParallelGroup(Alignment.LEADING)
+                                                                                                               .addGroup(mainPanelLayout
+                                                                                                                                 .createParallelGroup(Alignment.BASELINE)
+                                                                                                                                 .addComponent(assembleButton)
+                                                                                                                                 .addComponent(assemblyLangChooser))
+                                                                                                               .addComponent(this.asmFileField, -2, -1, -2))
+                                                                                             .addPreferredGap(ComponentPlacement.UNRELATED)
+                                                                                             .addGroup(mainPanelLayout
+                                                                                                               .createParallelGroup(Alignment.BASELINE)
+                                                                                                               .addComponent(this.runFileField, -2, -1, -2)
+                                                                                                               .addComponent(linkButton))
+                                                                                             .addPreferredGap(ComponentPlacement.UNRELATED).
+                                                                                                     addComponent(runButton)
+                                                                                             .addGap(26, 26, 26)
+                                                                                             .addComponent(processOutput, -2, 100, -2))
+                                                                                     .addComponent(innerPanel, Alignment.TRAILING, -2, -1, -2))));
+
         mainPanel.setLayout(mainPanelLayout);
 
         GroupLayout windowLayout = new GroupLayout(this.getContentPane());
         this.getContentPane().setLayout(windowLayout);
-        windowLayout.setHorizontalGroup(windowLayout.createParallelGroup(Alignment.LEADING).addGroup(windowLayout.createSequentialGroup().addContainerGap().addComponent(mainPanel, -1, -1, 32767).addContainerGap()));
-        windowLayout.setVerticalGroup(windowLayout.createParallelGroup(Alignment.LEADING).addGroup(windowLayout.createSequentialGroup().addContainerGap().addComponent(mainPanel, -1, -1, 32767).addContainerGap()));
+        windowLayout.setHorizontalGroup(windowLayout
+                                                .createParallelGroup(Alignment.LEADING)
+                                                .addGroup(windowLayout
+                                                                  .createSequentialGroup()
+                                                                  .addContainerGap()
+                                                                  .addComponent(mainPanel, -1, -1, 32767)
+                                                                  .addContainerGap()));
+        windowLayout.setVerticalGroup(windowLayout
+                                              .createParallelGroup(Alignment.LEADING)
+                                              .addGroup(windowLayout
+                                                                .createSequentialGroup()
+                                                                .addContainerGap()
+                                                                .addComponent(mainPanel, -1, -1, 32767)
+                                                                .addContainerGap()));
 
         mainPanel.getAccessibleContext().setAccessibleName("tmpFilePath UI Assistant (S16)");
         this.setTitle("tmpFilePath UI Assistant");
@@ -244,7 +346,7 @@ class G_Lite extends JFrame implements Printable {
     private int writeAndExecuteCommand(String filePath, String command, String formatString) {
         File tmpFile = new File(filePath);
         try {
-            Files.write(tmpFile.toPath(), ((isWindows ? ("@echo off" + System.getProperty("line.separator")): "") + command).getBytes());
+            Files.write(tmpFile.toPath(), ((isWindows ? ("@echo off" + System.getProperty("line.separator")): "") + command).getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             if (!isWindows)
                 if (!tmpFile.setExecutable(true))
                     Logger.getLogger(G_Lite.class.getName()).log(Level.SEVERE, null, "Could not mark file \"" + filePath + "\" as executable.");
@@ -283,6 +385,21 @@ class G_Lite extends JFrame implements Printable {
      */
     private void onExitPressed() {
         System.exit(0);
+    }
+
+    /**
+     * Cleans up sout, cout, and runit files that are left behind.
+     */
+    private void onCleanPressed() {
+        String[] filesToClean = {"cout", "sout", runFileField.getText().isEmpty() ? "runit" : runFileField.getText()};
+        byte filesDeleted = 0;
+        try {
+            for (String filePath : filesToClean)
+                filesDeleted += Files.deleteIfExists(new File(filePath).toPath()) ? 1 : 0;
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+        JOptionPane.showMessageDialog(this, filesDeleted + " File(s) cleaned.");
     }
 
     /**
@@ -331,7 +448,7 @@ class G_Lite extends JFrame implements Printable {
         String linkCommand = compileExecutable + linkFlags + outfile + ' ' + cfile + ' ' + sfile + ' ' + option;
         int result = writeAndExecuteCommand(tmpFilePath, linkCommand, "Link Result: %d");
         if (result == 0) {
-            if (fileToRun.equals("")) {
+            if (fileToRun.isEmpty()) {
                 this.runFileField.setText("runit");
             } else {
                 this.runFileField.setText(fileToRun);
@@ -365,7 +482,7 @@ class G_Lite extends JFrame implements Printable {
      * @param filePath The path of the file to read.
      * @return If the file could read correctly.
      */
-    private boolean _appendOutput(String filePath) {
+    private boolean appendOutput(String filePath) {
         try {
             Files.lines(new File(filePath).toPath()).forEachOrdered(line -> this.lines.add(this.tab2spaces(line)));
         } catch (FileNotFoundException e) {
@@ -390,11 +507,11 @@ class G_Lite extends JFrame implements Printable {
         this.lines.add(this.processText.getText());
         this.lines.add(System.getProperty("line.separator") + " ******************" + System.getProperty("line.separator"));
         this.lines.add(sfile);
-        if (!_appendOutput(sfile))
+        if (!appendOutput(sfile))
             return false;
         this.lines.add(System.getProperty("line.separator") + "------------------" + System.getProperty("line.separator"));
         this.lines.add(cfile);
-        return _appendOutput(cfile);
+        return appendOutput(cfile);
     }
 
     /**
@@ -437,6 +554,7 @@ class G_Lite extends JFrame implements Printable {
         this.initFileOutput();
 
         try {
+            Files.write(new File(resultFile).toPath(), lines, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             resultWriter = new PrintWriter(new FileWriter(resultFile));
             this.lines.forEach(resultWriter::println);
         } catch (IOException e) {
