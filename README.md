@@ -7,4 +7,14 @@
 - --compileexecutable=(compileexecutable)
 
 ## How to use
-TODO
+- Write your C and ARM Assembly code
+- Pick your C file
+- Pick your Assembly file
+- Press Compile
+- Press Assemble
+- Press Link
+- Press Run
+- Either
+ - Press Print to print out the output or
+ - Press File to get your output as a txt file.
+- Done!
