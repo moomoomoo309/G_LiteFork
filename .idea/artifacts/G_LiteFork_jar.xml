@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="G_LiteFork:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/G_LiteFork_jar</output-path>
+    <root id="archive" name="G_LiteFork.jar">
+      <element id="module-output" name="G_LiteFork" />
+    </root>
+  </artifact>
+</component>

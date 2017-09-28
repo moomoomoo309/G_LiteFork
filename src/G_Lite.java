@@ -43,7 +43,7 @@ class G_Lite extends JFrame implements Printable {
     private JTextField runFileField;
     private JTextField asmFileField;
     private JTextArea processText;
-    private JTextField studentName;
+    private JTextField nameField;
     private String workPath;
     private int[] pageBreaks;
 
@@ -85,6 +85,7 @@ class G_Lite extends JFrame implements Printable {
                 JFrame frame = new JFrame();
                 JOptionPane.showMessageDialog(frame, "Initialization error", e.getMessage(), JOptionPane.ERROR_MESSAGE);
                 frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                return;
             }
         }
 
@@ -96,17 +97,17 @@ class G_Lite extends JFrame implements Printable {
      */
     private void initComponents() {
         JPanel mainPanel = new JPanel();
-        JButton compileButton = new JButton();
-        JButton assembleButton = new JButton();
-        JButton linkButton = new JButton();
-        JButton runButton = new JButton();
 
         cFileField = new JTextField();
         asmFileField = new JTextField();
         runFileField = new JTextField();
 
-        JButton cLangChooser = new JButton();
-        JButton assemblyLangChooser = new JButton();
+        JButton compileButton = new JButton();
+        JButton assembleButton = new JButton();
+        JButton linkButton = new JButton();
+        JButton runButton = new JButton();
+        JButton cFileChooserButton = new JButton();
+        JButton asmFileChooserButton = new JButton();
         JButton exitButton = new JButton();
         JButton printButton = new JButton();
         JButton fileButton = new JButton();
@@ -115,20 +116,20 @@ class G_Lite extends JFrame implements Printable {
         JPanel innerPanel = new JPanel();
         JScrollPane processOutput = new JScrollPane();
         processText = new JTextArea();
-        studentName = new JTextField();
-        JLabel studentNameLabel = new JLabel();
+        nameField = new JTextField();
+        JLabel nameLabel = new JLabel();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         mainPanel.setBorder(BorderFactory.createTitledBorder("CS252 UI Assistant (S16)"));
 
         compileButton.setText("Compile");
-        compileButton.setToolTipText("Press this button to compile the C program. A file cout is created in the working directory.");
+        compileButton.setToolTipText("Press this button to compile the C program. This will create a file named cout in the working directory.");
         compileButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         compileButton.addActionListener(evt -> onCompilePressed());
 
         assembleButton.setText("Assemble");
-        assembleButton.setToolTipText("Press this button to assemble the ARM file. This will create an sout file in the working directory.");
+        assembleButton.setToolTipText("Press this button to assemble the ARM assembly file. This will create a file named sout in the working directory.");
         assembleButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         assembleButton.addActionListener(evt1 -> onAssemblePressed());
 
@@ -142,19 +143,19 @@ class G_Lite extends JFrame implements Printable {
         runButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         runButton.addActionListener(evt1 -> onRunPressed());
 
-        cLangChooser.setBackground(new Color(255, 255, 255));
-        cLangChooser.setText("C  language file");
-        cLangChooser.setToolTipText("Press this button ot chose the C lanuguage file to compile");
-        cLangChooser.setActionCommand("C_language_file");
-        cLangChooser.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        cLangChooser.addActionListener(evt2 -> onCLangChooserPressed());
+        cFileChooserButton.setBackground(new Color(255, 255, 255));
+        cFileChooserButton.setText("C language file");
+        cFileChooserButton.setToolTipText("Press this button to choose the C lanuguage file to compile.");
+        cFileChooserButton.setActionCommand("C_language_file");
+        cFileChooserButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+        cFileChooserButton.addActionListener(evt2 -> onCLangChooserPressed());
 
-        assemblyLangChooser.setBackground(new Color(255, 255, 255));
-        assemblyLangChooser.setText("Assembly Language file");
-        assemblyLangChooser.setToolTipText("Press this butto to chose the ARM assembly language file to assemble.");
-        assemblyLangChooser.setActionCommand("Assembly_lang_file");
-        assemblyLangChooser.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        assemblyLangChooser.addActionListener(evt2 -> onAssemblyLangChooserPressed());
+        asmFileChooserButton.setBackground(new Color(255, 255, 255));
+        asmFileChooserButton.setText("Assembly Language file");
+        asmFileChooserButton.setToolTipText("Press this butto to choose the ARM assembly language file to assemble.");
+        asmFileChooserButton.setActionCommand("Assembly_lang_file");
+        asmFileChooserButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+        asmFileChooserButton.addActionListener(evt2 -> onAssemblyLangChooserPressed());
 
         exitButton.setText("Exit");
         exitButton.setToolTipText("This will exit the application.");
@@ -167,12 +168,12 @@ class G_Lite extends JFrame implements Printable {
         cleanButton.addActionListener(evt -> onCleanPressed());
 
         printButton.setText("Print");
-        printButton.setToolTipText("This button will print the contents of the text area to the left." + lineSeparator);
+        printButton.setToolTipText("This button will print the contents of the text area to the left.");
         printButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         printButton.addActionListener(actionListener -> onPrintPressed());
 
         fileButton.setText("File");
-        fileButton.setToolTipText("This button will create a text file of the source files and execution");
+        fileButton.setToolTipText("This button will create a text file of the source files and execution.");
         fileButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         fileButton.addActionListener(evt1 -> onFilePressed());
 
@@ -218,8 +219,8 @@ class G_Lite extends JFrame implements Printable {
 
         processOutput.setViewportView(processText);
 
-        studentName.addActionListener(evt -> onStudentNameChanged());
-        studentNameLabel.setText("Student Name");
+        nameField.addActionListener(evt -> onStudentNameChanged());
+        nameLabel.setText("    Name");
 
         GroupLayout mainPanelLayout = new GroupLayout(mainPanel);
         mainPanelLayout.setHorizontalGroup(mainPanelLayout
@@ -256,17 +257,19 @@ class G_Lite extends JFrame implements Printable {
                                                                                                                                    .addPreferredGap(ComponentPlacement.RELATED)
                                                                                                                                    .addGroup(mainPanelLayout
                                                                                                                                                      .createParallelGroup(Alignment.LEADING, false)
-                                                                                                                                                     .addComponent(studentName, -1, 172, 32767)
-                                                                                                                                                     .addComponent(cFileField))))
+                                                                                                                                                     .addComponent(nameField, -1, 172, 32767)
+                                                                                                                                                     .addComponent(cFileField)))
+                                                                                                                           .addGroup(Alignment.LEADING, mainPanelLayout
+                                                                                                                                   .createSequentialGroup()
+                                                                                                                                   .addComponent(nameLabel)))
                                                                                                          .addGap(18, 18, 18)
                                                                                                          .addGroup(mainPanelLayout
                                                                                                                            .createParallelGroup(Alignment.LEADING)
-                                                                                                                           .addComponent(studentNameLabel)
-                                                                                                                           .addComponent(cLangChooser)
-                                                                                                                           .addComponent(assemblyLangChooser))))
+                                                                                                                           .addComponent(cFileChooserButton)
+                                                                                                                           .addComponent(asmFileChooserButton))))
                                                                      .addContainerGap(163, 32767)));
         mainPanelLayout.linkSize(0, assembleButton, compileButton, linkButton, runButton);
-        mainPanelLayout.linkSize(0, assemblyLangChooser, cLangChooser);
+        mainPanelLayout.linkSize(0, asmFileChooserButton, cFileChooserButton);
         mainPanelLayout.setVerticalGroup(mainPanelLayout
                                                  .createParallelGroup(Alignment.LEADING)
                                                  .addGroup(mainPanelLayout
@@ -278,24 +281,24 @@ class G_Lite extends JFrame implements Printable {
                                                                                              .createSequentialGroup()
                                                                                              .addGroup(mainPanelLayout
                                                                                                                .createParallelGroup(Alignment.LEADING, false)
-                                                                                                               .addComponent(studentName, -2, -1, -2)
+                                                                                                               .addComponent(nameField, -2, -1, -2)
                                                                                                                .addGroup(mainPanelLayout
                                                                                                                                  .createSequentialGroup()
                                                                                                                                  .addGap(3, 3, 3)
-                                                                                                                                 .addComponent(studentNameLabel, -1, -1, 32767)))
+                                                                                                                                 .addComponent(nameLabel, -1, -1, 32767)))
                                                                                              .addPreferredGap(ComponentPlacement.UNRELATED)
                                                                                              .addGroup(mainPanelLayout
                                                                                                                .createParallelGroup(Alignment.BASELINE)
                                                                                                                .addComponent(compileButton)
                                                                                                                .addComponent(cFileField, -2, -1, -2)
-                                                                                                               .addComponent(cLangChooser))
+                                                                                                               .addComponent(cFileChooserButton))
                                                                                              .addPreferredGap(ComponentPlacement.RELATED)
                                                                                              .addGroup(mainPanelLayout
                                                                                                                .createParallelGroup(Alignment.LEADING)
                                                                                                                .addGroup(mainPanelLayout
                                                                                                                                  .createParallelGroup(Alignment.BASELINE)
                                                                                                                                  .addComponent(assembleButton)
-                                                                                                                                 .addComponent(assemblyLangChooser))
+                                                                                                                                 .addComponent(asmFileChooserButton))
                                                                                                                .addComponent(asmFileField, -2, -1, -2))
                                                                                              .addPreferredGap(ComponentPlacement.UNRELATED)
                                                                                              .addGroup(mainPanelLayout
@@ -558,6 +561,7 @@ class G_Lite extends JFrame implements Printable {
      */
     private boolean appendOutput(String filePath) {
         try {
+            //The reason this is a foreach and not just .forEachOrdered is so that the exceptions can be caught.
             for (String line : Files.lines(new File(filePath).toPath()).toArray(String[]::new))
                 lines.add(tab2spaces(line));
         } catch (FileNotFoundException | NoSuchFileException e) {
@@ -578,7 +582,7 @@ class G_Lite extends JFrame implements Printable {
     private boolean initFileOutput() {
         String cfile = workPath + cFileField.getText();
         String sfile = workPath + asmFileField.getText();
-        lines.add(studentName.getText());
+        lines.add(nameField.getText());
         lines.add(lineSeparator);
         lines.add(processText.getText());
         lines.add(lineSeparator + " ******************" + lineSeparator);
