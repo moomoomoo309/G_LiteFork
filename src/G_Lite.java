@@ -1,14 +1,8 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 import javax.print.PrintService;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
@@ -16,27 +10,21 @@ import java.awt.print.PrinterJob;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@SuppressWarnings({"HardcodedFileSeparator", "unused"})
 class G_Lite extends JFrame implements Printable {
     private static String compileExecutable = "arm-none-eabi-gcc";
     private static String runExecutable = "arm-none-eabi-run";
     private final JFileChooser fileChooser = new JFileChooser();
-    private final String cFileDescription = "C_language_file";
-    private final String asmLangFileDescription = "Assembly_lang_file";
     private final String compileFlags = " -g -c -o ";
-    private final String linkFlags = " -g -o ";
     private final String compileCommand = compileExecutable + compileFlags;
     private final boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("Windows");
     private final String runFlags = " ";
@@ -46,34 +34,34 @@ class G_Lite extends JFrame implements Printable {
     private final String runfileName = "cs";
     private final String runfile = runfileName + '.' + (isWindows ? windowsFileExtension: nixFileExtension);
     private final List<String> lines = new ArrayList<>();
-    private final String spaces = String.join("", Collections.nCopies(43, " "));
-    private final int[] spc = new int[]{4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1};
-    private JButton assemblyLangChooser;
-    private JButton assembleButton;
     private JTextField cFileField;
-    private JButton cLangChooser;
-    private JButton compileButton;
-    private JButton exitButton;
-    private JButton linkButton;
-    private JButton printButton;
-    private JButton runButton;
     private JTextField runFileField;
     private JTextField asmFileField;
-    private JButton filePrint;
-    private JLabel studentNameLabel;
-    private JPanel mainPanel;
-    private JPanel innerPanel;
-    private JScrollPane processOutput;
     private JTextArea processText;
     private JTextField studentName;
-    private String fileName;
     private String workPath = "./";
     private int[] pageBreaks;
 
+    /**
+     * Required for Swing to work correctly.
+     */
     private G_Lite() {
         this.initComponents();
     }
 
+    /**
+     * Parses command line arguments and sets the look and feel of Swing.
+     * @param args Command line arguments. <br>
+     *             The program looks for:
+     *             <ol>
+     *                 <li>
+     *                     --runexecutable=(executablename)
+     *                 </li>
+     *                 <li>
+     *                     --compileexecutable=(compileexecutable)\
+     *                 </li>
+     *             </ol>
+     */
     public static void main(String[] args) {
         for (String arg : args)
             if (arg.toLowerCase().startsWith("--runexecutable="))
@@ -87,7 +75,7 @@ class G_Lite extends JFrame implements Printable {
         } catch (IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException | ClassNotFoundException _e) {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
+            } catch (IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException | ClassNotFoundException e) {
                 Logger.getLogger(G_Lite.class.getName()).log(Level.SEVERE, null, e);
             }
         }
@@ -95,92 +83,123 @@ class G_Lite extends JFrame implements Printable {
         EventQueue.invokeLater(() -> (new G_Lite()).setVisible(true));
     }
 
+    /**
+     * Sets up all of the components for the UI.
+     */
     private void initComponents() {
-        this.mainPanel = new JPanel();
-        this.compileButton = new JButton();
-        this.assembleButton = new JButton();
-        this.linkButton = new JButton();
-        this.runButton = new JButton();
+        JPanel mainPanel = new JPanel();
+        JButton compileButton = new JButton();
+        JButton assembleButton = new JButton();
+        JButton linkButton = new JButton();
+        JButton runButton = new JButton();
+
         this.cFileField = new JTextField();
         this.asmFileField = new JTextField();
         this.runFileField = new JTextField();
-        this.cLangChooser = new JButton();
-        this.assemblyLangChooser = new JButton();
-        this.innerPanel = new JPanel();
-        this.exitButton = new JButton();
-        this.printButton = new JButton();
-        this.filePrint = new JButton();
-        this.processOutput = new JScrollPane();
+
+        JButton cLangChooser = new JButton();
+        JButton assemblyLangChooser = new JButton();
+        JButton exitButton = new JButton();
+        JButton printButton = new JButton();
+        JButton filePrint = new JButton();
+
+        JPanel innerPanel = new JPanel();
+        JScrollPane processOutput = new JScrollPane();
         this.processText = new JTextArea();
         this.studentName = new JTextField();
-        this.studentNameLabel = new JLabel();
-        this.setDefaultCloseOperation(3);
-        this.mainPanel.setBorder(BorderFactory.createTitledBorder("CS252 UI Assistant (S16)"));
-        this.compileButton.setText("Compile");
-        this.compileButton.setToolTipText("Press this button to compile the C program. A file cout is created in the working directory.");
-        this.compileButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        this.compileButton.addActionListener(G_Lite.this::onCompilePressed);
-        this.assembleButton.setText("assembleButton");
-        this.assembleButton.setToolTipText("Press this button to assemble the ARM file. This will create an sout file in the working directory.");
-        this.assembleButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        this.assembleButton.addActionListener(G_Lite.this::onAssemblePressed);
-        this.linkButton.setText("Link");
-        this.linkButton.setToolTipText("Press this button to create a runnable file. If a name is entered in the text box tat will be the name of the file, otherwise it is called runit.");
-        this.linkButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        this.linkButton.addActionListener(G_Lite.this::onLinkPressed);
-        this.runButton.setText("Run");
-        this.runButton.setToolTipText("Press this button to run the file.");
-        this.runButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        this.runButton.addActionListener(G_Lite.this::onRunPressed);
-        this.cLangChooser.setBackground(new Color(255, 255, 255));
-        this.cLangChooser.setText("C  language file");
-        this.cLangChooser.setToolTipText("Press this button ot chose the C lanuguage file to compile");
-        this.cLangChooser.setActionCommand("C_language_file");
-        this.cLangChooser.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        this.cLangChooser.addActionListener(G_Lite.this::onCLangChooserPressed);
-        this.assemblyLangChooser.setBackground(new Color(255, 255, 255));
-        this.assemblyLangChooser.setText("Assembly Language file");
-        this.assemblyLangChooser.setToolTipText("Press this butto to chose the ARM assembly language file to assemble.");
-        this.assemblyLangChooser.setActionCommand("Assembly_lang_file");
-        this.assemblyLangChooser.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        this.assemblyLangChooser.addActionListener(G_Lite.this::onAssemblyLangChooserPressed);
-        this.exitButton.setText("Exit");
-        this.exitButton.setToolTipText("This will exit the application.");
-        this.exitButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        this.exitButton.addActionListener(G_Lite.this::onExitPressed);
-        this.printButton.setText("printButton");
-        this.printButton.setToolTipText("This button will print the contents of the text area to the left." + System.getProperty("line.separator"));
-        this.printButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        this.printButton.addActionListener(G_Lite.this::onPrintPressed);
-        this.filePrint.setText("File");
-        this.filePrint.setToolTipText("This button will create a text file of the source files and execution");
-        this.filePrint.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-        this.filePrint.addActionListener(G_Lite.this::onFilePressed);
-        GroupLayout jPanel2Layout = new GroupLayout(this.innerPanel);
-        this.innerPanel.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(Alignment.LEADING).addGroup(jPanel2Layout.createSequentialGroup().addGroup(jPanel2Layout.createParallelGroup(Alignment.LEADING).addGroup(Alignment.TRAILING, jPanel2Layout.createSequentialGroup().addComponent(this.printButton).addGap(18, 18, 18).addComponent(this.filePrint, -1, -1, 32767)).addGroup(Alignment.TRAILING, jPanel2Layout.createSequentialGroup().addGap(0, 0, 32767).addComponent(this.exitButton))).addContainerGap()));
-        jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(Alignment.LEADING).addGroup(jPanel2Layout.createSequentialGroup().addGap(20, 20, 20).addGroup(jPanel2Layout.createParallelGroup(Alignment.BASELINE).addComponent(this.printButton).addComponent(this.filePrint)).addPreferredGap(ComponentPlacement.RELATED, 36, 32767).addComponent(this.exitButton).addContainerGap()));
+        JLabel studentNameLabel = new JLabel();
+
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        mainPanel.setBorder(BorderFactory.createTitledBorder("tmpFilePath UI Assistant (S16)"));
+
+        compileButton.setText("Compile");
+        compileButton.setToolTipText("Press this button to compile the C program. A file cout is created in the working directory.");
+        compileButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+        compileButton.addActionListener(evt -> G_Lite.this.onCompilePressed());
+
+        assembleButton.setText("Assemble");
+        assembleButton.setToolTipText("Press this button to assemble the ARM file. This will create an sout file in the working directory.");
+        assembleButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+        assembleButton.addActionListener(evt1 -> G_Lite.this.onAssemblePressed());
+
+        linkButton.setText("Link");
+        linkButton.setToolTipText("Press this button to create a runnable file. If a name is entered in the text box tat will be the name of the file, otherwise it is called runit.");
+        linkButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+        linkButton.addActionListener(evt1 -> G_Lite.this.onLinkPressed());
+
+        runButton.setText("Run");
+        runButton.setToolTipText("Press this button to run the file.");
+        runButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+        runButton.addActionListener(evt1 -> G_Lite.this.onRunPressed());
+
+        cLangChooser.setBackground(new Color(255, 255, 255));
+        cLangChooser.setText("C  language file");
+        cLangChooser.setToolTipText("Press this button ot chose the C lanuguage file to compile");
+        cLangChooser.setActionCommand("C_language_file");
+        cLangChooser.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+        cLangChooser.addActionListener(evt2 -> G_Lite.this.onCLangChooserPressed());
+
+        assemblyLangChooser.setBackground(new Color(255, 255, 255));
+        assemblyLangChooser.setText("Assembly Language file");
+        assemblyLangChooser.setToolTipText("Press this butto to chose the ARM assembly language file to assemble.");
+        assemblyLangChooser.setActionCommand("Assembly_lang_file");
+        assemblyLangChooser.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+        assemblyLangChooser.addActionListener(evt2 -> G_Lite.this.onAssemblyLangChooserPressed());
+
+        exitButton.setText("Exit");
+        exitButton.setToolTipText("This will exit the application.");
+        exitButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+        exitButton.addActionListener(evt -> G_Lite.this.onExitPressed());
+
+        printButton.setText("Print");
+        printButton.setToolTipText("This button will print the contents of the text area to the left." + System.getProperty("line.separator"));
+        printButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+        printButton.addActionListener(actionListener -> this.onPrintPressed());
+
+        filePrint.setText("File");
+        filePrint.setToolTipText("This button will create a text file of the source files and execution");
+        filePrint.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+        filePrint.addActionListener(evt1 -> G_Lite.this.onFilePressed());
+
+        GroupLayout innerLayout = new GroupLayout(innerPanel);
+        innerLayout.setHorizontalGroup(innerLayout.createParallelGroup(Alignment.LEADING).addGroup(innerLayout.createSequentialGroup().addGroup(innerLayout.createParallelGroup(Alignment.LEADING).addGroup(Alignment.TRAILING, innerLayout.createSequentialGroup().addComponent(printButton).addGap(18, 18, 18).addComponent(filePrint, -1, -1, 32767)).addGroup(Alignment.TRAILING, innerLayout.createSequentialGroup().addGap(0, 0, 32767).addComponent(exitButton))).addContainerGap()));
+        innerLayout.setVerticalGroup(innerLayout.createParallelGroup(Alignment.LEADING).addGroup(innerLayout.createSequentialGroup().addGap(20, 20, 20).addGroup(innerLayout.createParallelGroup(Alignment.BASELINE).addComponent(printButton).addComponent(filePrint)).addPreferredGap(ComponentPlacement.RELATED, 36, 32767).addComponent(exitButton).addContainerGap()));
+        innerPanel.setLayout(innerLayout);
+
         this.processText.setColumns(20);
         this.processText.setRows(5);
         this.processText.setToolTipText("This text area will show the output of the compile, assemble, link and the result of the running of the  linked file.");
-        this.processOutput.setViewportView(this.processText);
-        this.studentName.addActionListener(G_Lite.this::onStudentNameChanged);
-        this.studentNameLabel.setText("Student Name");
-        GroupLayout mainPanelLayout = new GroupLayout(this.mainPanel);
-        this.mainPanel.setLayout(mainPanelLayout);
-        mainPanelLayout.setHorizontalGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addGroup(mainPanelLayout.createSequentialGroup().addComponent(this.processOutput, -1, 420, 32767).addGap(37, 37, 37).addComponent(this.innerPanel, -2, -1, -2).addGap(22, 22, 22)).addGroup(mainPanelLayout.createSequentialGroup().addGap(30, 30, 30).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addComponent(this.runButton).addGroup(mainPanelLayout.createSequentialGroup().addGroup(mainPanelLayout.createParallelGroup(Alignment.TRAILING, false).addGroup(Alignment.LEADING, mainPanelLayout.createSequentialGroup().addComponent(this.linkButton).addPreferredGap(ComponentPlacement.RELATED).addComponent(this.runFileField, -1, 172, 32767)).addGroup(Alignment.LEADING, mainPanelLayout.createSequentialGroup().addComponent(this.assembleButton).addPreferredGap(ComponentPlacement.RELATED).addComponent(this.asmFileField)).addGroup(Alignment.LEADING, mainPanelLayout.createSequentialGroup().addComponent(this.compileButton).addPreferredGap(ComponentPlacement.RELATED).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING, false).addComponent(this.studentName, -1, 172, 32767).addComponent(this.cFileField)))).addGap(18, 18, 18).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addComponent(this.studentNameLabel).addComponent(this.cLangChooser).addComponent(this.assemblyLangChooser)))).addContainerGap(163, 32767)));
-        mainPanelLayout.linkSize(0, this.assembleButton, this.compileButton, this.linkButton, this.runButton);
-        mainPanelLayout.linkSize(0, this.assemblyLangChooser, this.cLangChooser);
-        mainPanelLayout.setVerticalGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addGroup(mainPanelLayout.createSequentialGroup().addContainerGap(50, 32767).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addGroup(Alignment.TRAILING, mainPanelLayout.createSequentialGroup().addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING, false).addComponent(this.studentName, -2, -1, -2).addGroup(mainPanelLayout.createSequentialGroup().addGap(3, 3, 3).addComponent(this.studentNameLabel, -1, -1, 32767))).addPreferredGap(ComponentPlacement.UNRELATED).addGroup(mainPanelLayout.createParallelGroup(Alignment.BASELINE).addComponent(this.compileButton).addComponent(this.cFileField, -2, -1, -2).addComponent(this.cLangChooser)).addPreferredGap(ComponentPlacement.RELATED).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addGroup(mainPanelLayout.createParallelGroup(Alignment.BASELINE).addComponent(this.assembleButton).addComponent(this.assemblyLangChooser)).addComponent(this.asmFileField, -2, -1, -2)).addPreferredGap(ComponentPlacement.UNRELATED).addGroup(mainPanelLayout.createParallelGroup(Alignment.BASELINE).addComponent(this.runFileField, -2, -1, -2).addComponent(this.linkButton)).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(this.runButton).addGap(26, 26, 26).addComponent(this.processOutput, -2, 100, -2)).addComponent(this.innerPanel, Alignment.TRAILING, -2, -1, -2))));
-        GroupLayout layout = new GroupLayout(this.getContentPane());
-        this.getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING).addGroup(layout.createSequentialGroup().addContainerGap().addComponent(this.mainPanel, -1, -1, 32767).addContainerGap()));
-        layout.setVerticalGroup(layout.createParallelGroup(Alignment.LEADING).addGroup(layout.createSequentialGroup().addContainerGap().addComponent(this.mainPanel, -1, -1, 32767).addContainerGap()));
-        this.mainPanel.getAccessibleContext().setAccessibleName("CS252 UI Assistant (S16)");
-        this.setTitle("CS252 UI Assistant");
+
+        processOutput.setViewportView(this.processText);
+
+        this.studentName.addActionListener(evt -> this.onStudentNameChanged());
+        studentNameLabel.setText("Student Name");
+
+        GroupLayout mainPanelLayout = new GroupLayout(mainPanel);
+        mainPanelLayout.setHorizontalGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addGroup(mainPanelLayout.createSequentialGroup().addComponent(processOutput, -1, 420, 32767).addGap(37, 37, 37).addComponent(innerPanel, -2, -1, -2).addGap(22, 22, 22)).addGroup(mainPanelLayout.createSequentialGroup().addGap(30, 30, 30).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addComponent(runButton).addGroup(mainPanelLayout.createSequentialGroup().addGroup(mainPanelLayout.createParallelGroup(Alignment.TRAILING, false).addGroup(Alignment.LEADING, mainPanelLayout.createSequentialGroup().addComponent(linkButton).addPreferredGap(ComponentPlacement.RELATED).addComponent(this.runFileField, -1, 172, 32767)).addGroup(Alignment.LEADING, mainPanelLayout.createSequentialGroup().addComponent(assembleButton).addPreferredGap(ComponentPlacement.RELATED).addComponent(this.asmFileField)).addGroup(Alignment.LEADING, mainPanelLayout.createSequentialGroup().addComponent(compileButton).addPreferredGap(ComponentPlacement.RELATED).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING, false).addComponent(this.studentName, -1, 172, 32767).addComponent(this.cFileField)))).addGap(18, 18, 18).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addComponent(studentNameLabel).addComponent(cLangChooser).addComponent(assemblyLangChooser)))).addContainerGap(163, 32767)));
+        mainPanelLayout.linkSize(0, assembleButton, compileButton, linkButton, runButton);
+        mainPanelLayout.linkSize(0, assemblyLangChooser, cLangChooser);
+        mainPanelLayout.setVerticalGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addGroup(mainPanelLayout.createSequentialGroup().addContainerGap(50, 32767).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addGroup(Alignment.TRAILING, mainPanelLayout.createSequentialGroup().addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING, false).addComponent(this.studentName, -2, -1, -2).addGroup(mainPanelLayout.createSequentialGroup().addGap(3, 3, 3).addComponent(studentNameLabel, -1, -1, 32767))).addPreferredGap(ComponentPlacement.UNRELATED).addGroup(mainPanelLayout.createParallelGroup(Alignment.BASELINE).addComponent(compileButton).addComponent(this.cFileField, -2, -1, -2).addComponent(cLangChooser)).addPreferredGap(ComponentPlacement.RELATED).addGroup(mainPanelLayout.createParallelGroup(Alignment.LEADING).addGroup(mainPanelLayout.createParallelGroup(Alignment.BASELINE).addComponent(assembleButton).addComponent(assemblyLangChooser)).addComponent(this.asmFileField, -2, -1, -2)).addPreferredGap(ComponentPlacement.UNRELATED).addGroup(mainPanelLayout.createParallelGroup(Alignment.BASELINE).addComponent(this.runFileField, -2, -1, -2).addComponent(linkButton)).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(runButton).addGap(26, 26, 26).addComponent(processOutput, -2, 100, -2)).addComponent(innerPanel, Alignment.TRAILING, -2, -1, -2))));
+        mainPanel.setLayout(mainPanelLayout);
+
+        GroupLayout windowLayout = new GroupLayout(this.getContentPane());
+        this.getContentPane().setLayout(windowLayout);
+        windowLayout.setHorizontalGroup(windowLayout.createParallelGroup(Alignment.LEADING).addGroup(windowLayout.createSequentialGroup().addContainerGap().addComponent(mainPanel, -1, -1, 32767).addContainerGap()));
+        windowLayout.setVerticalGroup(windowLayout.createParallelGroup(Alignment.LEADING).addGroup(windowLayout.createSequentialGroup().addContainerGap().addComponent(mainPanel, -1, -1, 32767).addContainerGap()));
+
+        mainPanel.getAccessibleContext().setAccessibleName("tmpFilePath UI Assistant (S16)");
+        this.setTitle("tmpFilePath UI Assistant");
         this.pack();
     }
 
+    /**
+     * Prints the output in {@link #lines} onto a page.
+     * @param g The {@link Graphics} backend used to draw the text
+     * @param pf How the page should be formatted.
+     * @param pageIndex The page to print.
+     * @return 0 if successful, 1 if not.
+     */
     public int print(Graphics g, PageFormat pf, int pageIndex) {
         Font font = new Font(Font.MONOSPACED, Font.PLAIN, 12);
         FontMetrics metrics = g.getFontMetrics(font);
@@ -215,6 +234,13 @@ class G_Lite extends JFrame implements Printable {
         }
     }
 
+    /**
+     * Writes to a temporary .sh/.bat file, puts command in it, executes it, and appends formatString with the exit code to {@link #lines}.
+     * @param filePath The path to the temporary file.
+     * @param command The command to be put into the file and run.
+     * @param formatString The string used by .format, passed the exit code of the result.
+     * @return The exit code of the command, or -1 if the command could not be run.
+     */
     private int writeAndExecuteCommand(String filePath, String command, String formatString) {
         File tmpFile = new File(filePath);
         try {
@@ -239,100 +265,111 @@ class G_Lite extends JFrame implements Printable {
         return -1;
     }
 
-    private void onCompilePressed(ActionEvent evt) {
+    /**
+     * Compiles the program, or does nothing if no file is in {@link #cFileField}.
+     */
+    private void onCompilePressed() {
         if (this.cFileField.getText().isEmpty())
             return;
         String cfile = '"' + this.workPath + this.cFileField.getText() + '"';
         String outfile = '"' + this.workPath + "cout" + '"';
-        String cs252 = this.workPath + this.runfile;
-        String Ccommand = this.compileCommand + outfile + ' ' + cfile;
-        File tmpFile = new File(cs252);
-        writeAndExecuteCommand(cs252, Ccommand, "Compile result: %d");
+        String tmpFilePath = this.workPath + this.runfile;
+        String compileCommand = this.compileCommand + outfile + ' ' + cfile;
+        writeAndExecuteCommand(tmpFilePath, compileCommand, "Compile result: %d");
     }
 
-    private void onExitPressed(ActionEvent evt) {
+    /**
+     * Exits the program.
+     */
+    private void onExitPressed() {
         System.exit(0);
     }
 
-    private void onCLangChooserPressed(ActionEvent evt) {
-        this.openFilePicker(evt, this.cFileField);
+    /**
+     * Pops up the filepicker for the user pick to the file to compile.
+     */
+    private void onCLangChooserPressed() {
+        this.openFilePicker(this.cFileField);
     }
 
-    private void onAssemblyLangChooserPressed(ActionEvent evt) {
-        this.openFilePicker(evt, this.asmFileField);
+    /**
+     * Pops up the filepicker for the user pick to the file to assemble.
+     */
+    private void onAssemblyLangChooserPressed() {
+        this.openFilePicker(this.asmFileField);
     }
 
-    private void onAssemblePressed(ActionEvent evt) {
+    /**
+     * Assembles the .s file, or does nothing if {@link #asmFileField} is empty.
+     */
+    private void onAssemblePressed() {
         if (this.asmFileField.getText().isEmpty())
             return;
         String sfile = '"' + this.workPath + this.asmFileField.getText() + '"';
         String outfile = '"' + this.workPath + "sout" + '"';
-        String Acommand = this.compileCommand + outfile + ' ' + sfile;
-        String cs252 = this.workPath + this.runfile;
-        File tmpFile = new File(cs252);
-        writeAndExecuteCommand(cs252, Acommand, "Assemble Result: %d");
+        String assembleCommand = this.compileCommand + outfile + ' ' + sfile;
+        String tmpFilePath = this.workPath + this.runfile;
+        writeAndExecuteCommand(tmpFilePath, assembleCommand, "Assemble Result: %d");
     }
 
-    private void onLinkPressed(ActionEvent evt) {
+    /**
+     * Tries to link the files.
+     */
+    private void onLinkPressed() {
         String cfile = '"' + this.workPath + "cout" + '"';
         String sfile = '"' + this.workPath + "sout" + '"';
         String option = " -T armulator-ram-hosted.ld";
-        String cs252 = this.workPath + this.runfile;
-        File tmpFile = new File(cs252);
-        String rlfile = this.runFileField.getText();
+        String tmpFilePath = this.workPath + this.runfile;
+        String fileToRun = this.runFileField.getText();
         String outfile;
-        if (rlfile.isEmpty()) {
+        if (fileToRun.isEmpty()) {
             outfile = '"' + this.workPath + "runit" + '"';
         } else {
-            outfile = '"' + this.workPath + rlfile + '"';
+            outfile = '"' + this.workPath + fileToRun + '"';
         }
-        String Lcommand = compileExecutable + linkFlags + outfile + ' ' + cfile + ' ' + sfile + ' ' + option;
-        int result = writeAndExecuteCommand(cs252, Lcommand, "Link Result: %d");
+        String linkFlags = " -g -o ";
+        String linkCommand = compileExecutable + linkFlags + outfile + ' ' + cfile + ' ' + sfile + ' ' + option;
+        int result = writeAndExecuteCommand(tmpFilePath, linkCommand, "Link Result: %d");
         if (result == 0) {
-            if (rlfile.equals("")) {
+            if (fileToRun.equals("")) {
                 this.runFileField.setText("runit");
             } else {
-                this.runFileField.setText(rlfile);
+                this.runFileField.setText(fileToRun);
             }
         }
 
     }
 
-    private void onRunPressed(ActionEvent evt) {
-        String cs252 = this.workPath + this.runfile;
-        File tmpFile = new File(cs252);
-        String rfile = this.runFileField.getText();
-        String outfile;
-        if (rfile.equals("")) {
-            outfile = '"' + this.workPath + "runit" + '"';
-        } else {
-            outfile = '"' + this.workPath + rfile + '"';
-        }
-        String Rcommand = runCommand + outfile;
-        writeAndExecuteCommand(cs252, Rcommand, "");
+    /**
+     * Tries to run the file.
+     */
+    private void onRunPressed() {
+        String tmpFilePath = this.workPath + this.runfile;
+        String fileToRun = this.runFileField.getText();
+        String outfile = '"' + this.workPath + (fileToRun.equals("") ? "runit": fileToRun) + '"';
+        String runCommand = this.runCommand + outfile;
+        writeAndExecuteCommand(tmpFilePath, runCommand, "");
     }
 
+    /**
+     * Converts tabs to 4 spaces.
+     * @param in The string to replace.
+     * @return The string, but with all tabs replaced with 4 spaces.
+     */
     private String tab2spaces(String in) {
-        StringBuilder expand = new StringBuilder();
-
-        for (int index = 0; index < in.length(); index++) {
-            if (in.charAt(index) == '\t') {
-                expand.append(this.spaces.substring(index, this.spc[index] + index));
-            } else {
-                expand.append(in.charAt(index));
-            }
-        }
-
-        return expand.toString();
+        return in.replace("\t", "    ");
     }
 
+    /**
+     * Appends the contents of filePath to {@link #lines}.
+     * @param filePath The path of the file to read.
+     * @return If the file could read correctly.
+     */
     private boolean _appendOutput(String filePath) {
         try {
-            BufferedReader instream = new BufferedReader(new FileReader(filePath));
-            instream.lines().forEachOrdered(line -> this.lines.add(this.tab2spaces(line)));
-            instream.close();
+            Files.lines(new File(filePath).toPath()).forEachOrdered(line -> this.lines.add(this.tab2spaces(line)));
         } catch (FileNotFoundException e) {
-            System.out.println("Could not find file at \""+filePath+"\". Were the C and S files generated correctly?");
+            System.out.println("Could not find file at \"" + filePath + "\". Were the C and S files generated correctly?");
             return false;
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -341,10 +378,13 @@ class G_Lite extends JFrame implements Printable {
         return true;
     }
 
+    /**
+     * Generates the final output for printing/file writing, and puts it into {@link #lines}.
+     * @return If the output could be appended correctly.
+     */
     private boolean initFileOutput() {
         String cfile = this.workPath + this.cFileField.getText();
         String sfile = this.workPath + this.asmFileField.getText();
-        BufferedReader instream;
         this.lines.add(this.studentName.getText());
         this.lines.add(System.getProperty("line.separator"));
         this.lines.add(this.processText.getText());
@@ -357,7 +397,10 @@ class G_Lite extends JFrame implements Printable {
         return _appendOutput(cfile);
     }
 
-    private void onPrintPressed(ActionEvent evt) {
+    /**
+     * Prints the file if ready, or does nothing otherwise.
+     */
+    private void onPrintPressed() {
         if (!this.initFileOutput())
             return;
         PrinterJob job = PrinterJob.getPrinterJob();
@@ -378,11 +421,17 @@ class G_Lite extends JFrame implements Printable {
         }
     }
 
+    /**
+     * Does nothing, since nothing needs to be done on student name change.
+     */
     @SuppressWarnings("EmptyMethod")
-    private void onStudentNameChanged(ActionEvent evt) {
+    private void onStudentNameChanged() {
     }
 
-    private void onFilePressed(ActionEvent evt) {
+    /**
+     * Runs {@link #initFileOutput()} to get the output in place, then tries to write it to a file.
+     */
+    private void onFilePressed() {
         PrintWriter resultWriter = null;
         String resultFile = this.workPath + "result.txt";
         this.initFileOutput();
@@ -399,16 +448,20 @@ class G_Lite extends JFrame implements Printable {
         }
     }
 
-    private void openFilePicker(ActionEvent evt, JTextField field) {
+    /**
+     * Opens the file picker, then outputs the result into the given text field.
+     * @param outputField The field to output the path onto.
+     */
+    private void openFilePicker(JTextField outputField) {
         int returnVal = this.fileChooser.showOpenDialog(this);
         if (returnVal == 0) {
             File file = this.fileChooser.getSelectedFile();
-            this.fileName = file.getName();
+            String fileName = file.getName();
             String myPath = file.getPath();
             myPath = myPath.replace('\\', '/');
             int endIndex = myPath.lastIndexOf('/');
             this.workPath = myPath.substring(0, endIndex + 1);
-            field.setText(this.fileName);
+            outputField.setText(fileName);
         }
 
     }
