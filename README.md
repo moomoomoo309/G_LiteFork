@@ -4,13 +4,15 @@
 
 ## Command line arguments
 - --runexecutable=(executablename)
+  - Specifies the name/path of the binary used for running. Defaults to "arm-none-eabi-run".
 - --compileexecutable=(compileexecutable)
+  - Specifies the name/path of the binary used for compiling. Defaults to "arm-none-eabi-gcc".
 
 ## How to use
 - Write your C and ARM Assembly code
-  - (Recommended) Use a C editor for C, and a text editor for assembly.
+  - (Recommended) Use a C editor for C, and a text editor for assembly. (Don't use notepad!)
     - Recommended C Editors: Visual Studio, Xcode, CLion, Eclipse
-    - Recommended Text Editors: Sublime Text, Vim, Emacs, Notepad++, Notepad 2 (not Notepad, preferably)
+    - Recommended Text Editors: Sublime Text, Vim, Emacs, Notepad++, Notepad 2
 - Pick your C file and press Compile.
 - Pick your Assembly file and press Assemble.
 - Press Link
