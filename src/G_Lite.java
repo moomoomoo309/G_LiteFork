@@ -84,10 +84,10 @@ class G_Lite extends JFrame implements Printable {
         try {
             //GTK doesn't always want to show up.
             UIManager.setLookAndFeel(com.sun.java.swing.plaf.gtk.GTKLookAndFeel.class.getName());
-        } catch (IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException | ClassNotFoundException _e) {
+        } catch (IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException | ClassNotFoundException | NoClassDefFoundError _e) {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException | ClassNotFoundException e) {
+            } catch (IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException | ClassNotFoundException | NoClassDefFoundError e) {
                 JFrame frame = new JFrame();
                 JOptionPane.showMessageDialog(frame, "Initialization error", e.getMessage(), JOptionPane.ERROR_MESSAGE);
                 frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
