@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.List;
 
 class G_Lite extends JFrame implements Printable {
     private static String compileExecutable = "arm-none-eabi-gcc";
@@ -32,13 +31,20 @@ class G_Lite extends JFrame implements Printable {
     private final String runfileName = "cs";
     private final String runfile = runfileName + '.' + (isWindows ? windowsFileExtension: nixFileExtension);
     private final String lineSeparator = System.getProperty("line.separator");
+
+    // Error messages, so you can see all the ways it can fail.
     private final String workPathIsNullErrorMessage = "You need to compile or assemble something first!";
     private final String markExecutableErrorMessage = "Could not mark file \"%s\" as executable.";
     private final String InterruptedErrorMessage = "Command failed! Error message: \"%s\"";
     private final String IOErrorMessage = "File error! Message: \"%s\"";
     private final String compileFieldEmptyErrorMessage = "You need to pick a file to compile!";
     private final String assembleFieldEmptyErrorMessage = "You need to pick a file to assemble!";
-    private final List<String> lines = new ArrayList<>();
+    private final String fileNotFoundErrorMessage = "Could not find file at \"%s\". Were the C and S files generated correctly?";
+    private final String printerErrorMessage = "Could not print. Error mesage: \"%s\"";
+    private final String noDefaultPrinterErrorMessage = "No Default Printer!";
+
+    private final String fileWrittenSuccessMessage = "File written to %sresult.txt.";
+    private final ArrayList<String> lines = new ArrayList<>();
     private JTextField cFileField;
     private JTextField runFileField;
     private JTextField asmFileField;
@@ -294,7 +300,7 @@ class G_Lite extends JFrame implements Printable {
                                                                                                                .addComponent(cFileChooserButton))
                                                                                              .addPreferredGap(ComponentPlacement.RELATED)
                                                                                              .addGroup(mainPanelLayout
-                                                                                                               .createParallelGroup(Alignment.LEADING)
+                                                                                                               .createParallelGroup(Alignment.BASELINE)
                                                                                                                .addGroup(mainPanelLayout
                                                                                                                                  .createParallelGroup(Alignment.BASELINE)
                                                                                                                                  .addComponent(assembleButton)
@@ -539,7 +545,7 @@ class G_Lite extends JFrame implements Printable {
         }
         String tmpFilePath = workPath + runfile;
         String fileToRun = runFileField.getText();
-        String outfile = '"' + workPath + (fileToRun.equals("") ? "runit": fileToRun) + '"';
+        String outfile = '"' + workPath + (fileToRun.isEmpty() ? "runit": fileToRun) + '"';
         writeAndExecuteCommand(tmpFilePath, runCommand + outfile, "");
     }
 
@@ -561,14 +567,12 @@ class G_Lite extends JFrame implements Printable {
      */
     private boolean appendOutput(String filePath) {
         try {
-            //The reason this is a foreach and not just .forEachOrdered is so that the exceptions can be caught.
-            for (String line : Files.lines(new File(filePath).toPath()).toArray(String[]::new))
-                lines.add(tab2spaces(line));
+            Files.readAllLines(new File(filePath).toPath()).forEach(line -> lines.add(tab2spaces(line)));
         } catch (FileNotFoundException | NoSuchFileException e) {
-            JOptionPane.showMessageDialog(this, "Could not find file at \"" + filePath + "\". Were the C and S files generated correctly?", "File not found", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, String.format(fileNotFoundErrorMessage, filePath), "File not found", JOptionPane.ERROR_MESSAGE);
             return false;
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "File read error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, String.format(IOErrorMessage, e.getMessage()), "File read error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;
@@ -607,7 +611,7 @@ class G_Lite extends JFrame implements Printable {
         PrinterJob job = PrinterJob.getPrinterJob();
         PrintService printer = job.getPrintService();
         if (printer == null) {
-            JOptionPane.showMessageDialog(this, "No Default Printer!", "Printer Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, noDefaultPrinterErrorMessage, "Printer Error", JOptionPane.ERROR_MESSAGE);
         } else {
             job.setPrintable(this);
             boolean ok = job.printDialog();
@@ -615,7 +619,7 @@ class G_Lite extends JFrame implements Printable {
                 try {
                     job.print();
                 } catch (PrinterException e) {
-                    JOptionPane.showMessageDialog(this, "Printing error", e.getMessage(), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, String.format(printerErrorMessage, e.getMessage()), "Printing error", JOptionPane.ERROR_MESSAGE);
                 }
             }
 
@@ -634,7 +638,7 @@ class G_Lite extends JFrame implements Printable {
      */
     private void onFilePressed() {
         if (workPath == null) {
-            JOptionPane.showMessageDialog(this, "You need to compile or assemble first!", "User Input Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, workPathIsNullErrorMessage, "User Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         String resultFile = workPath + "result.txt";
@@ -642,9 +646,9 @@ class G_Lite extends JFrame implements Printable {
 
         try {
             Files.write(new File(resultFile).toPath(), lines, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-            JOptionPane.showMessageDialog(this, "File written to " + workPath + "result.txt.");
+            JOptionPane.showMessageDialog(this, String.format(fileWrittenSuccessMessage, workPath));
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Trouble writing file: " + e, "File output error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, String.format(IOErrorMessage, e.getMessage()), "File output error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
