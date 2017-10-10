@@ -1,3 +1,5 @@
+import com.sun.java.swing.plaf.gtk.GTKLookAndFeel;
+
 import javax.print.PrintService;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -14,10 +16,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class G_Lite extends JFrame implements Printable {
+    private static final Pattern COMPILE = Pattern.compile("\t", Pattern.LITERAL);
     private static String compileExecutable = "arm-none-eabi-gcc";
     private static String runExecutable = "arm-none-eabi-run";
     private final JFileChooser fileChooser = new JFileChooser();
@@ -83,7 +89,7 @@ class G_Lite extends JFrame implements Printable {
 
         try {
             //GTK doesn't always want to show up.
-            UIManager.setLookAndFeel(com.sun.java.swing.plaf.gtk.GTKLookAndFeel.class.getName());
+            UIManager.setLookAndFeel(GTKLookAndFeel.class.getName());
         } catch (IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException | ClassNotFoundException | NoClassDefFoundError _e) {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -356,7 +362,7 @@ class G_Lite extends JFrame implements Printable {
         int numPages;
         int start;
         if (pageBreaks == null) { //Initialize the printing vars.
-            int linesPerPage = (int) (pf.getImageableHeight() / (double) lineHeight);
+            int linesPerPage = (int) (pf.getImageableHeight() / lineHeight);
             numPages = (lines.size() - 1) / linesPerPage;
             pageBreaks = new int[numPages];
 
@@ -422,8 +428,10 @@ class G_Lite extends JFrame implements Printable {
             process.destroy();
             Files.deleteIfExists(tmpFile.toPath());
             return result;
+        } catch (FileNotFoundException | NoSuchFileException e) {
+            JOptionPane.showMessageDialog(this, String.format(fileNotFoundErrorMessage, filePath), "File not found", JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, String.format(IOErrorMessage, e.getMessage()), "File I/O error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, String.format(IOErrorMessage, e.getMessage()), "File IO error", JOptionPane.ERROR_MESSAGE);
         } catch (InterruptedException e) {
             JOptionPane.showMessageDialog(this, String.format(InterruptedErrorMessage, e.getMessage()), "Command execution error", JOptionPane.ERROR_MESSAGE);
         }
@@ -463,7 +471,9 @@ class G_Lite extends JFrame implements Printable {
         byte filesDeleted = 0;
         try {
             for (String filePath : filesToClean)
-                filesDeleted += Files.deleteIfExists(new File(filePath).toPath()) ? 1: 0;
+                filesDeleted += Files.deleteIfExists(Paths.get(workPath + filePath)) ? 1: 0;
+        } catch (FileNotFoundException | NoSuchFileException e) {
+            JOptionPane.showMessageDialog(this, String.format(fileNotFoundErrorMessage, e.getMessage()), "File not found", JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, String.format(IOErrorMessage, e.getMessage()), "Clean error", JOptionPane.ERROR_MESSAGE);
         }
@@ -517,11 +527,7 @@ class G_Lite extends JFrame implements Printable {
         String tmpFilePath = workPath + runfile;
         String fileToRun = runFileField.getText();
         String outfile;
-        if (fileToRun.isEmpty()) {
-            outfile = '"' + workPath + "runit" + '"';
-        } else {
-            outfile = '"' + workPath + fileToRun + '"';
-        }
+        outfile = '"' + workPath + (fileToRun.isEmpty() ? "runit": fileToRun) + '"';
         String linkFlags = " -g -o ";
         String linkCommand = compileExecutable + linkFlags + outfile + ' ' + cfile + ' ' + sfile + ' ' + option;
         int result = writeAndExecuteCommand(tmpFilePath, linkCommand, "Link Result: %d");
@@ -556,7 +562,7 @@ class G_Lite extends JFrame implements Printable {
      * @return The string, but with all tabs replaced with 4 spaces.
      */
     private String tab2spaces(String in) {
-        return in.replace("\t", "    ");
+        return COMPILE.matcher(in).replaceAll(Matcher.quoteReplacement("    "));
     }
 
     /**
@@ -645,8 +651,10 @@ class G_Lite extends JFrame implements Printable {
         initFileOutput();
 
         try {
-            Files.write(new File(resultFile).toPath(), lines, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+            Files.write(Paths.get(resultFile), lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             JOptionPane.showMessageDialog(this, String.format(fileWrittenSuccessMessage, workPath));
+        } catch (FileNotFoundException | NoSuchFileException e) {
+            JOptionPane.showMessageDialog(this, String.format(fileNotFoundErrorMessage, e.getMessage()), "File not found", JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, String.format(IOErrorMessage, e.getMessage()), "File output error", JOptionPane.ERROR_MESSAGE);
         }
