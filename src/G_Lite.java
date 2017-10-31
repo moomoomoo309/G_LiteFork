@@ -29,7 +29,7 @@ class G_Lite extends JFrame implements Printable {
     private final JFileChooser fileChooser = new JFileChooser();
     private final String compileFlags = " -g -c -o ";
     private final String compileCommand = compileExecutable + compileFlags;
-    private final boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("Windows");
+    private final boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
     private final String runFlags = " ";
     private final String runCommand = runExecutable + runFlags;
     private final String windowsFileExtension = "bat";
