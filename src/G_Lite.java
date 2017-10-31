@@ -4,6 +4,7 @@ import javax.print.PrintService;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import java.util.List;
 import java.awt.*;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -50,7 +51,7 @@ class G_Lite extends JFrame implements Printable {
     private final String noDefaultPrinterErrorMessage = "No Default Printer!";
 
     private final String fileWrittenSuccessMessage = "File written to %sresult.txt.";
-    private final ArrayList<String> lines = new ArrayList<>();
+    private List<String> lines = new ArrayList<>();
     private JTextField cFileField;
     private JTextField runFileField;
     private JTextField asmFileField;
@@ -573,7 +574,7 @@ class G_Lite extends JFrame implements Printable {
      */
     private boolean appendOutput(String filePath) {
         try {
-            Files.readAllLines(new File(filePath).toPath()).forEach(line -> lines.add(tab2spaces(line)));
+            Files.lines(new File(filePath).toPath()).forEach(line -> lines.add(tab2spaces(line)));
         } catch (FileNotFoundException | NoSuchFileException e) {
             JOptionPane.showMessageDialog(this, String.format(fileNotFoundErrorMessage, filePath), "File not found", JOptionPane.ERROR_MESSAGE);
             return false;
@@ -612,8 +613,11 @@ class G_Lite extends JFrame implements Printable {
             JOptionPane.showMessageDialog(this, workPathIsNullErrorMessage, "User Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        int linesLen = lines.size();
         if (!initFileOutput())
             return;
+        List<String> oldLines = lines;
+        lines = lines.subList(linesLen, lines.size());
         PrinterJob job = PrinterJob.getPrinterJob();
         PrintService printer = job.getPrintService();
         if (printer == null) {
@@ -628,8 +632,8 @@ class G_Lite extends JFrame implements Printable {
                     JOptionPane.showMessageDialog(this, String.format(printerErrorMessage, e.getMessage()), "Printing error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-
         }
+        lines = oldLines;
     }
 
     /**
@@ -648,10 +652,11 @@ class G_Lite extends JFrame implements Printable {
             return;
         }
         String resultFile = workPath + "result.txt";
+        int linesLen = lines.size();
         initFileOutput();
 
         try {
-            Files.write(Paths.get(resultFile), lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+            Files.write(Paths.get(resultFile), lines.subList(linesLen, lines.size()), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             JOptionPane.showMessageDialog(this, String.format(fileWrittenSuccessMessage, workPath));
         } catch (FileNotFoundException | NoSuchFileException e) {
             JOptionPane.showMessageDialog(this, String.format(fileNotFoundErrorMessage, e.getMessage()), "File not found", JOptionPane.ERROR_MESSAGE);
@@ -665,6 +670,7 @@ class G_Lite extends JFrame implements Printable {
      *
      * @param outputField The field to output the path onto.
      */
+    @SuppressWarnings("HardcodedFileSeparator")
     private void openFilePicker(JTextField outputField) {
         int returnVal = fileChooser.showOpenDialog(this);
         if (returnVal == 0) {
