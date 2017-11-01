@@ -137,56 +137,46 @@ class G_Lite extends JFrame implements Printable {
 
         compileButton.setText("Compile");
         compileButton.setToolTipText("Press this button to compile the C program. This will create a file named cout in the working directory.");
-        compileButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         compileButton.addActionListener(evt -> onCompilePressed());
 
         assembleButton.setText("Assemble");
         assembleButton.setToolTipText("Press this button to assemble the ARM assembly file. This will create a file named sout in the working directory.");
-        assembleButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         assembleButton.addActionListener(evt1 -> onAssemblePressed());
 
         linkButton.setText("Link");
         linkButton.setToolTipText("Press this button to create a runnable file. If a name is entered in the text box tat will be the name of the file, otherwise it is called runit.");
-        linkButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         linkButton.addActionListener(evt1 -> onLinkPressed());
 
         runButton.setText("Run");
         runButton.setToolTipText("Press this button to run the file.");
-        runButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         runButton.addActionListener(evt1 -> onRunPressed());
 
         cFileChooserButton.setBackground(new Color(255, 255, 255));
         cFileChooserButton.setText("C language file");
         cFileChooserButton.setToolTipText("Press this button to choose the C lanuguage file to compile.");
         cFileChooserButton.setActionCommand("C_language_file");
-        cFileChooserButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         cFileChooserButton.addActionListener(evt2 -> onCLangChooserPressed());
 
         asmFileChooserButton.setBackground(new Color(255, 255, 255));
         asmFileChooserButton.setText("Assembly Language file");
         asmFileChooserButton.setToolTipText("Press this butto to choose the ARM assembly language file to assemble.");
         asmFileChooserButton.setActionCommand("Assembly_lang_file");
-        asmFileChooserButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         asmFileChooserButton.addActionListener(evt2 -> onAssemblyLangChooserPressed());
 
         exitButton.setText("Exit");
         exitButton.setToolTipText("This will exit the application.");
-        exitButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         exitButton.addActionListener(evt -> onExitPressed());
 
         cleanButton.setText("Clean");
         cleanButton.setToolTipText("This will remove any leftover files, such as cout, sout, and runit.");
-        cleanButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         cleanButton.addActionListener(evt -> onCleanPressed());
 
         printButton.setText("Print");
         printButton.setToolTipText("This button will print the contents of the text area to the left.");
-        printButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         printButton.addActionListener(actionListener -> onPrintPressed());
 
         fileButton.setText("File");
         fileButton.setToolTipText("This button will create a text file of the source files and execution.");
-        fileButton.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
         fileButton.addActionListener(evt1 -> onFilePressed());
 
         GroupLayout innerLayout = new GroupLayout(innerPanel);
@@ -405,7 +395,7 @@ class G_Lite extends JFrame implements Printable {
         }
         File tmpFile = new File(filePath);
         try {
-            Files.write(tmpFile.toPath(), ((isWindows ? ("@echo off" + lineSeparator): "") + command).getBytes());
+            Files.write(tmpFile.toPath(), (((isWindows ? "@echo off": "#!/bin/bash") + lineSeparator) + command).getBytes());
             if (!isWindows)
                 if (!tmpFile.setExecutable(true))
                     JOptionPane.showMessageDialog(this, String.format(markExecutableErrorMessage, filePath), "File Permissions Error", JOptionPane.ERROR_MESSAGE);
@@ -629,7 +619,6 @@ class G_Lite extends JFrame implements Printable {
                     JOptionPane.showMessageDialog(this, String.format(printerErrorMessage, e.getMessage()), "Printing error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-
         }
     }
 
@@ -659,6 +648,7 @@ class G_Lite extends JFrame implements Printable {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, String.format(IOErrorMessage, e.getMessage()), "File output error", JOptionPane.ERROR_MESSAGE);
         }
+        lines.clear();
     }
 
     /**
