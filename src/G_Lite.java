@@ -594,7 +594,8 @@ class G_Lite extends JFrame implements Printable {
         String sfile = workPath + asmFileField.getText();
         lines.add(nameField.getText());
         lines.add(lineSeparator);
-        lines.add(processText.getText());
+        String processTextContents = processText.getText();
+        lines.add(processTextContents.substring(processTextContents.indexOf(lineSeparator,processTextContents.lastIndexOf("Link Result: "))));
         lines.add(lineSeparator + " ******************" + lineSeparator);
         lines.add(sfile);
         if (!appendOutput(sfile))
