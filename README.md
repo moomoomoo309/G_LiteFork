@@ -10,9 +10,8 @@
 
 ## How to use
 - Write your C and ARM Assembly code
-  - (Recommended) Use a C editor for C, and a text editor for assembly. (Don't use notepad!)
-    - Recommended C Editors: Visual Studio, Xcode, CLion, Eclipse
-    - Recommended Text Editors: Sublime Text, Vim, Emacs, Notepad++, Notepad 2
+  - Use a nice text editor for assembly. (Don't use notepad!)
+    - Recommended Text Editors: Sublime Text (with ARM Assembly plugin), Vim, Emacs, Notepad++, Notepad 2
 - Pick your C file and press Compile.
 - Pick your Assembly file and press Assemble.
 - Press Link
@@ -21,4 +20,5 @@
   - Press Print to print out the output
 - or
   - Press File to get your output as a txt file.
+- (Optional) Press clean to remove the leftover files.
 - Done!
